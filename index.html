@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101225">
+<title>Study Planner | برنامه‌ریز مطالعه</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+:root{--bg:#0d1020;--panel:#151a30;--panel2:#1b2140;--line:#2b3151;--text:#f0f1ff;--muted:#9ba3c5;--accent:#9b83ff;--accent2:#59b9ff;--glow:rgba(137,112,255,.18);--good:#62d6b0;--danger:#ff718c;--radius:17px;--shadow:0 14px 40px rgba(0,0,0,.2)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:'Vazirmatn',Tahoma,sans-serif;min-height:100vh;transition:.25s;background-image:radial-gradient(ellipse at 12% 0%,var(--glow),transparent 38%),radial-gradient(ellipse at 90% 15%,rgba(65,160,255,.08),transparent 34%)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:1440px;margin:auto;padding:24px clamp(12px,3vw,38px) 50px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:13px}.logo{width:45px;height:45px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:22px;box-shadow:0 8px 25px var(--glow)}h1{font-size:20px;margin:0;font-weight:700}.subtitle{font-size:12px;color:var(--muted);margin-top:2px}.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel);padding:9px 13px;border-radius:11px;font-size:12px;transition:.2s}.btn:hover{border-color:var(--accent);transform:translateY(-1px)}.btn.primary{background:linear-gradient(120deg,var(--accent),#7864e8);border:0;color:white}.btn.ghost{background:transparent}.btn.danger{color:var(--danger)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.week-nav{display:flex;align-items:center;gap:10px}.week-nav strong{font-size:14px;min-width:190px;text-align:center}.icon-btn{width:34px;height:34px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:17px}.toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:16px;align-items:start}.maincol{min-width:0}.sidecol{display:grid;gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:13px}.panel-head h2{font-size:14px;margin:0}.muted{color:var(--muted);font-size:11px}
+.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px}
+.day{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;min-width:0;min-height:215px;transition:.2s}.day.dragover{border-color:var(--accent);background:var(--glow)}.day-top{display:flex;justify-content:space-between;align-items:center;gap:4px;padding-bottom:9px;border-bottom:1px solid var(--line);margin-bottom:9px}.day-name{font-size:12px;font-weight:700}.day-date{font-size:10px;color:var(--muted);margin-top:2px}.day-total{font-size:10px;color:var(--accent2);white-space:nowrap}.parts{display:grid;gap:7px}.part{position:relative;border:1px solid color-mix(in srgb,var(--subject-color,var(--line)) 55%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--subject-color,var(--accent)) 15%,var(--panel)),var(--panel));border-radius:10px;padding:8px 8px 7px;cursor:grab;min-width:0;transition:border-color .15s,transform .15s}.part:active{cursor:grabbing}.part.subject-match{transform:translateY(-2px);border-color:var(--subject-color)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--subject-color) 65%,transparent),0 7px 22px color-mix(in srgb,var(--subject-color) 28%,transparent);filter:saturate(1.3)}.part.subject-dim{opacity:.28;filter:grayscale(.55)}.part-subject{font-size:10px;color:var(--subject-color,var(--accent2));margin-bottom:3px;font-weight:700}.part.drop-before:before,.part.drop-after:after{content:"";position:absolute;left:5px;right:5px;height:3px;border-radius:5px;background:var(--accent2);box-shadow:0 0 10px var(--accent2);z-index:3}.part.drop-before:before{top:-6px}.part.drop-after:after{bottom:-6px}.part-topic{font-size:11px;font-weight:600;overflow-wrap:anywhere}.part-meta{font-size:10px;color:var(--muted);margin-top:4px}.part-actions{display:flex;gap:5px;margin-top:6px;justify-content:flex-end}.mini{border:0;background:transparent;color:var(--muted);font-size:10px;padding:2px 4px}.mini:hover{color:var(--text)}.add-part{width:100%;border:1px dashed #454d75;background:transparent;color:var(--muted);border-radius:9px;padding:7px 4px;font-size:10px;margin-top:8px}.add-part:hover{border-color:var(--accent);color:var(--accent)}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.metric{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px}.metric-label{font-size:10px;color:var(--muted)}.metric-value{font-size:19px;font-weight:700;margin-top:4px}.metric-unit{font-size:10px;color:var(--muted);font-weight:400}
+.bar-list{display:grid;gap:10px}.zero-subjects{font-size:10px;line-height:1.9;color:var(--muted);border-top:1px dashed var(--line);padding-top:7px;margin-top:2px}.bar-row{display:grid;grid-template-columns:82px 1fr 48px;gap:8px;align-items:center;font-size:11px}.bar-track{height:7px;background:var(--panel2);border-radius:20px;overflow:hidden}.bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),var(--accent2));min-width:0}.bar-value{text-align:left;color:var(--muted);font-size:10px}
+.note-preview{width:100%;min-height:115px;resize:vertical;background:var(--panel2);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:11px;font-size:12px;line-height:1.9;outline:none}.note-preview:focus,input:focus,select:focus,textarea:focus{border-color:var(--accent)}.note-actions{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.empty{color:var(--muted);font-size:10px;text-align:center;padding:12px 3px}.footer-note{text-align:center;color:var(--muted);font-size:10px;margin-top:18px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(4,6,15,.72);display:none;align-items:center;justify-content:center;padding:15px;z-index:20;backdrop-filter:blur(7px)}.modal-backdrop.show{display:flex}.modal{width:min(470px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:19px;box-shadow:0 25px 90px #0008;max-height:90vh;overflow:auto}.modal h3{margin:0 0 15px;font-size:16px}.field{display:grid;gap:6px;margin-bottom:12px}.field label{font-size:11px;color:var(--muted)}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);padding:10px 11px;outline:none;font-size:12px}.field textarea{min-height:85px;resize:vertical}.modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:15px}.modal-actions .right{display:flex;gap:8px}.theme-picker{display:flex;gap:6px}.theme-dot{width:25px;height:25px;border-radius:50%;border:2px solid transparent}.theme-dot.active{outline:2px solid var(--text);outline-offset:2px}
+body[data-theme="space"]{--bg:#0b1022;--panel:#121a32;--panel2:#192746;--line:#2b4167;--accent:#8e85ff;--accent2:#55d1ff;--glow:rgba(92,112,255,.22)}
+body[data-theme="dark"]{--bg:#111318;--panel:#191c24;--panel2:#202530;--line:#343b49;--accent:#a78bfa;--accent2:#80bfff;--glow:rgba(150,130,255,.1)}
+body[data-theme="glass"]{--bg:#101326;--panel:rgba(31,37,67,.82);--panel2:rgba(49,57,94,.62);--line:rgba(151,157,220,.27);--accent:#b09aff;--accent2:#66d2ff;--glow:rgba(119,93,255,.23)}
+body[data-theme="light"]{--bg:#f2f3fb;--panel:#fff;--panel2:#f5f5ff;--line:#dfe1f0;--text:#272943;--muted:#777d9b;--accent:#7865d8;--accent2:#318cc9;--glow:rgba(130,111,230,.12);--shadow:0 8px 25px rgba(44,48,90,.06)}
+body[data-theme="light"] .logo{color:white}body[data-theme="light"] .btn.primary{color:white}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}.sidecol{grid-template-columns:1fr 1fr}.week-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:650px){.app{padding:14px 10px 35px}header{align-items:flex-start}.brand h1{font-size:17px}.header-actions .btn{padding:8px;font-size:11px}.toolbar{padding:11px}.week-nav{width:100%;justify-content:space-between}.week-nav strong{min-width:0}.toolbar-actions{width:100%}.toolbar-actions .btn{flex:1}.layout{display:flex;flex-direction:column}.maincol,.sidecol{width:100%}.sidecol{display:grid;grid-template-columns:1fr}.week-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.day{min-height:160px;padding:9px}.summary-grid{grid-template-columns:repeat(3,1fr)}.metric{padding:9px 7px}.metric-value{font-size:16px}.panel{padding:12px}}
+
+@media print{
+ @page{size:A4 landscape;margin:10mm}
+ body{background:#fff!important;color:#20243a!important;background-image:none!important}
+ body *{visibility:hidden!important}
+ #weekGrid,#weekGrid *{visibility:visible!important}
+ .app{padding:0!important;max-width:none!important}
+ header,.toolbar,.sidecol,.footer-note,.panel-head{display:none!important}
+ .layout{display:block!important}
+ .maincol{width:100%!important}
+ .panel{display:block!important;border:0!important;box-shadow:none!important;padding:0!important;background:#fff!important}
+ #weekGrid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important}
+ .day{min-height:0!important;background:#f8f9ff!important;border:1px solid #d9dced!important;break-inside:avoid;padding:7px!important}
+ .part{break-inside:avoid!important;color:#20243a!important;box-shadow:none!important}
+ .part-topic{color:#20243a!important}.part-meta{color:#555b70!important}
+ .add-part,.part-actions{display:none!important}
+}
+
+
+.sync-panel{margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:0 8px 28px #00000012}
+.sync-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sync-head h2{font-size:16px;margin:0}
+
+
+
+.sync-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:12px}
+.sync-status{font-size:12px;color:var(--muted);min-height:20px;margin-top:9px}
+.sync-warning{color:#f4c779}
+@media(max-width:520px){.sync-panel{padding:12px}}
+
+</style>
+</head>
+<body data-theme="space">
+<div class="app">
+<header>
+ <div class="brand"><div class="logo">✦</div><div><h1>برنامه‌ریز مطالعه</h1><div class="subtitle">برنامه‌ریزی هفتگی، ساده و متمرکز</div></div></div>
+ <div class="header-actions">
+  <button class="btn" id="undoBtn" title="Ctrl+Z">↶ Undo</button><button class="btn" id="redoBtn" title="Ctrl+Shift+Z">↷ Redo</button><button class="btn" id="themeBtn">◐ تغییر پوسته</button>
+  <button class="btn" id="folderBtn">▣ انتخاب پوشه گزارش‌ها</button>
+  <button class="btn" id="excelBtn">▦ خروجی اکسل</button>
+  <button class="btn" id="pdfBtn">▤ خروجی PDF</button>
+  <button class="btn" id="imageBtn">▧ خروجی عکس</button>
+  <button class="btn" id="exportBtn">↓ پشتیبان</button>
+  <button class="btn" id="importBtn">↑ بازیابی پشتیبان</button><button class="btn" id="importWeekBtn">⇧ ورود به این هفته</button><input id="importFile" type="file" accept="application/json,.json" hidden><input id="importWeekFile" type="file" accept="application/json,.json" hidden>
+ </div>
+</header>
+<section class="toolbar">
+ <div class="week-nav"><button class="icon-btn" id="prevWeek" aria-label="هفته قبل">›</button><strong id="weekLabel">در حال بارگذاری...</strong><button class="icon-btn" id="nextWeek" aria-label="هفته بعد">‹</button></div>
+ <div class="toolbar-actions">
+  <button class="btn" id="todayBtn">این هفته</button>
+  <button class="btn" id="copyBtn">کپی هفته قبل</button>
+  <button class="btn primary" id="clearBtn">＋ برنامه جدید</button>
+ </div>
+</section>
+<section class="sync-panel">
+ <div class="sync-head"><h2>☁ همگام‌سازی با GitHub</h2><span class="muted" style="font-size:12px">ذخیره و دریافت برنامه بین دستگاه‌ها</span></div>
+ <div class="sync-actions">
+  <input id="ghTokenInput" type="password" autocomplete="off" placeholder="توکن جدید GitHub را اینجا وارد کن" aria-label="GitHub token" style="min-width:min(360px,100%);flex:1;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text)">
+  <button class="btn" id="ghSaveToken">ذخیره توکن</button>
+  <button class="btn primary" id="ghSync">↕ همگام‌سازی اکنون</button>
+ </div>
+ <div class="sync-status" id="ghStatus">برای شروع، توکن جدید GitHub را وارد و ذخیره کن. توکن داخل فایل سایت قرار نمی‌گیرد و فقط در همین مرورگر ذخیره می‌شود.</div>
+</section>
+<div class="layout">
+ <main class="maincol">
+  <section class="panel">
+   <div class="panel-head"><h2>جدول برنامه هفتگی</h2><span class="muted">برای ویرایش روی هر پارت بزن</span></div>
+   <div class="week-grid" id="weekGrid"></div>
+  </section>
+ </main>
+ <aside class="sidecol">
+  <section class="panel">
+   <div class="panel-head"><h2>تحلیل برنامه</h2><span class="muted">بر اساس زمان هدف</span></div>
+   <div class="summary-grid">
+    <div class="metric"><div class="metric-label">کل هفته</div><div class="metric-value" id="weekHours">۰ <span class="metric-unit">ساعت</span></div></div>
+    <div class="metric"><div class="metric-label">تعداد پارت</div><div class="metric-value" id="weekParts">۰</div></div>
+    <div class="metric"><div class="metric-label">میانگین روزانه</div><div class="metric-value" id="dailyAvg">۰ <span class="metric-unit">دقیقه</span></div></div>
+   </div>
+   <div style="height:16px"></div><div class="muted" style="margin-bottom:10px">زمان اختصاص‌یافته به هر روز</div><div class="bar-list" id="dayBars"></div>
+   <div style="height:17px"></div><div class="muted" style="margin-bottom:10px">توزیع زمان بین درس‌ها</div><div class="bar-list" id="subjectBars"></div>
+  </section>
+  <section class="panel">
+   <div class="panel-head"><h2>نوت و تکالیف</h2><button class="btn ghost" id="expandNote">بزرگ‌نمایی ↗</button></div>
+   <textarea class="note-preview" id="note" placeholder="تکالیف معلمان، کارهای مهم و یادداشت‌های هفته..."></textarea>
+   <div class="note-actions"><span class="muted" id="noteStatus">ذخیره خودکار</span><span class="muted">مخصوص همین هفته</span></div>
+  </section>
+ </aside>
+</div>
+<div class="footer-note">اطلاعات محلی ذخیره می‌شود و با اتصال اینترنت به‌صورت خودکار با GitHub هماهنگ می‌شود.</div>
+</div>
+<div class="modal-backdrop" id="partModal">
+ <div class="modal">
+  <h3 id="modalTitle">افزودن پارت مطالعاتی</h3>
+  <div class="field"><label for="subject">درس</label><select id="subject"></select></div>
+  <div class="field"><label for="topic">مبحث</label><input id="topic" maxlength="100" placeholder="مثلاً حد و پیوستگی"></div>
+  <div class="field"><label for="duration">مدت هدف (دقیقه)</label><input id="duration" type="number" min="1" max="1440" placeholder="مثلاً ۹۰"></div>
+  <div class="field"><label for="details">توضیحات (اختیاری)</label><textarea id="details" placeholder="نکته یا توضیحی برای این پارت..."></textarea></div>
+  <div class="field"><label for="targetDay">روز</label><select id="targetDay"></select></div>
+  <div class="modal-actions"><button class="btn danger" id="deletePart" style="visibility:hidden">حذف پارت</button><div class="right"><button class="btn" id="cancelModal">انصراف</button><button class="btn primary" id="savePart">ذخیره پارت</button></div></div>
+ </div>
+</div>
+<div class="modal-backdrop" id="noteModal">
+ <div class="modal"><h3>نوت هفتگی</h3><div class="field"><label for="bigNote">تکالیف و یادداشت‌ها</label><textarea id="bigNote" style="min-height:48vh" placeholder="هر چیزی که لازم داری اینجا بنویس..."></textarea></div><div class="modal-actions"><span></span><div class="right"><button class="btn" id="closeNote">بستن</button><button class="btn primary" id="saveNote">ذخیره</button></div></div></div>
+</div>
+<script>
+const SUBJECTS=['فارسی','عربی','دینی','زبان خارجه','فیزیک','حسابان','شیمی','هندسه','زمین‌شناسی','انسان و محیط زیست','آمار و احتمال','آزمون هفتگی','تاریخ معاصر'];
+const DAYS=['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
+const SUBJECT_COLORS=['#A9C4FF','#FFB58F','#D5A7FF','#79DCD0','#FFD36E','#FF9DBD','#83C9F5','#B5DB78','#E3A9F2','#79D7A8','#F39ACB','#F5BD72','#AAB2FF'];
+const SUBJECT_COLOR_MAP=Object.fromEntries(SUBJECTS.map((s,i)=>[s,SUBJECT_COLORS[i%SUBJECT_COLORS.length]]));
+const $=id=>document.getElementById(id);
+const DB_NAME='StudyPlannerDB',STORE='weeks';
+let db,weekStart,weekData={},editing=null,dragged=null,themeIndex=0;
+let undoStack=[],redoStack=[],lastSnapshot='',noteSaveTimer=null;
+let reportDirectoryHandle=null;
+const cloneData=o=>JSON.parse(JSON.stringify(o));
+function snapshot(){return JSON.stringify({parts:weekData.parts||DAYS.map(()=>[]),note:weekData.note||''})}
+function updateHistoryButtons(){if($('undoBtn')){$('undoBtn').disabled=!undoStack.length;$('redoBtn').disabled=!redoStack.length}}
+function saveWeek(){weekData.key=getWeekKey(weekStart);weekData.updatedAt=Date.now();const now=snapshot();if(lastSnapshot&&now!==lastSnapshot){undoStack.push(lastSnapshot);if(undoStack.length>100)undoStack.shift();redoStack=[];}lastSnapshot=now;let tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(weekData);tx.oncomplete=()=>{scheduleGithubSync()};renderAnalysis();updateHistoryButtons()}
+function applyHistory(target,other){if(!target.length)return;other.push(snapshot());const state=JSON.parse(target.pop());weekData.parts=state.parts;weekData.note=state.note||'';lastSnapshot=snapshot();weekData.key=getWeekKey(weekStart);weekData.updatedAt=Date.now();let tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(weekData);render();updateHistoryButtons()}
+function undo(){applyHistory(undoStack,redoStack)}function redo(){applyHistory(redoStack,undoStack)}
+const themes=['space','dark','glass','light'];
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:'key'});req.onsuccess=()=>{db=req.result;resolve()};req.onerror=()=>reject(req.error)})}
+function getWeekKey(date){return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0')}
+function startOfSaturday(d){let x=new Date(d.getFullYear(),d.getMonth(),d.getDate());let offset=(x.getDay()+1)%7;x.setDate(x.getDate()-offset);return x}
+function shiftDate(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x}
+function fmtDate(d,opts={}){return new Intl.DateTimeFormat('fa-IR-u-ca-persian',{day:'numeric',month:opts.month?'long':undefined,year:opts.year?'numeric':undefined}).format(d)}
+function weekDates(){return DAYS.map((_,i)=>shiftDate(weekStart,i))}
+function blankWeek(){return {key:getWeekKey(weekStart),parts:DAYS.map(()=>[]),note:''}}
+function loadWeek(key){return new Promise(resolve=>{let req=db.transaction(STORE).objectStore(STORE).get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>resolve(null)})}
+
+async function refreshWeek(){let key=getWeekKey(weekStart);weekData=await loadWeek(key)||blankWeek();undoStack=[];redoStack=[];lastSnapshot=snapshot();render();updateHistoryButtons()}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function minsText(n){n=Number(n)||0;let h=Math.floor(n/60),m=n%60;return h?`${h} ساعت${m?' و '+m+' دقیقه':''}`:`${m} دقیقه`}
+function movePart(fromDay,fromIndex,toDay,toIndex){
+ let source=weekData.parts[fromDay];if(!source||!source[fromIndex])return;
+ const item=source.splice(fromIndex,1)[0];
+ if(fromDay===toDay&&fromIndex<toIndex)toIndex--;
+ const target=weekData.parts[toDay]||(weekData.parts[toDay]=[]);
+ target.splice(Math.max(0,Math.min(toIndex,target.length)),0,item);
+ saveWeek();render();
+}
+function render(){let dates=weekDates();$('weekLabel').textContent=`${fmtDate(dates[0],{month:true})} تا ${fmtDate(dates[6],{month:true,year:true})}`;$('weekGrid').innerHTML='';
+ DAYS.forEach((day,i)=>{let parts=weekData.parts[i]||[];let total=parts.reduce((s,p)=>s+(+p.duration||0),0);let el=document.createElement('section');el.className='day';el.dataset.day=i;el.innerHTML=`<div class="day-top"><div><div class="day-name">${day}</div><div class="day-date">${fmtDate(dates[i])}</div></div><div class="day-total">${total?minsText(total):'—'}</div></div><div class="parts">${parts.map((p,j)=>`<div class="part" draggable="true" style="--subject-color:${SUBJECT_COLOR_MAP[p.subject]||'#9b83ff'}" data-subject="${esc(p.subject)}" data-index="${j}" data-day="${i}"><div class="part-subject">${esc(p.subject)}</div><div class="part-topic">${esc(p.topic)}</div><div class="part-meta">${minsText(p.duration)}</div>${p.details?`<div class="part-meta">${esc(p.details)}</div>`:''}<div class="part-actions"><button class="mini" data-edit="${i},${j}">ویرایش</button><button class="mini" data-del="${i},${j}">حذف</button></div></div>`).join('')||'<div class="empty">هنوز پارت اضافه نشده</div>'}</div><button class="add-part" data-add="${i}">＋ افزودن پارت</button>`;$('weekGrid').appendChild(el)});
+ $('weekGrid').querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>openPart(+b.dataset.add));
+ $('weekGrid').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{let [d,j]=b.dataset.edit.split(',').map(Number);openPart(d,j)});
+ $('weekGrid').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{let [d,j]=b.dataset.del.split(',').map(Number);if(confirm('این پارت حذف شود؟')){weekData.parts[d].splice(j,1);saveWeek();render()}});
+ let dragged=null;
+ $('weekGrid').querySelectorAll('.part').forEach(card=>{
+   card.addEventListener('dragstart',e=>{
+     dragged={day:+card.dataset.day,index:+card.dataset.index};
+     e.dataTransfer.effectAllowed='move';
+     e.dataTransfer.setData('text/plain','study-part');
+   });
+   card.addEventListener('dragover',e=>{
+     if(!dragged)return;
+     e.preventDefault();e.stopPropagation();
+     $('weekGrid').querySelectorAll('.part').forEach(x=>x.classList.remove('drop-before','drop-after'));
+     const r=card.getBoundingClientRect(),after=e.clientY>r.top+r.height/2;
+     card.classList.add(after?'drop-after':'drop-before');
+     card.dataset.dropAfter=after?'1':'0';
+   });
+   card.addEventListener('dragleave',()=>card.classList.remove('drop-before','drop-after'));
+   card.addEventListener('drop',e=>{
+     e.preventDefault();e.stopPropagation();
+     if(!dragged)return;
+     const targetDay=+card.dataset.day,targetIndex=+card.dataset.index;
+     const after=card.dataset.dropAfter==='1';
+     movePart(dragged.day,dragged.index,targetDay,targetIndex+(after?1:0));
+     dragged=null;
+   });
+   card.addEventListener('dragend',()=>{
+     dragged=null;
+     $('weekGrid').querySelectorAll('.part').forEach(x=>x.classList.remove('drop-before','drop-after'));
+   });
+ });
+ $('weekGrid').querySelectorAll('.day').forEach(day=>{
+   day.addEventListener('dragover',e=>{
+     if(e.target.closest('.part'))return;
+     if(dragged){e.preventDefault();day.classList.add('dragover')}
+   });
+   day.addEventListener('dragleave',e=>{if(!day.contains(e.relatedTarget))day.classList.remove('dragover')});
+   day.addEventListener('drop',e=>{
+     if(e.target.closest('.part'))return;
+     e.preventDefault();day.classList.remove('dragover');
+     if(!dragged)return;
+     movePart(dragged.day,dragged.index,+day.dataset.day,(weekData.parts[+day.dataset.day]||[]).length);
+     dragged=null;
+   });
+ });
+ $('note').value=weekData.note||'';renderAnalysis();updateHistoryButtons()
+}
+function renderAnalysis(){let all=weekData.parts.flat(),total=all.reduce((s,p)=>s+(+p.duration||0),0);$('weekHours').textContent=minsText(total);$('weekParts').textContent=all.length.toLocaleString('fa-IR');$('dailyAvg').textContent=minsText(Math.round(total/7));
+ let dayTotals=DAYS.map((_,i)=>(weekData.parts[i]||[]).reduce((s,p)=>s+(+p.duration||0),0));$('dayBars').innerHTML=dayTotals.map((v,i)=>`<div class="bar-row"><span>${DAYS[i]}</span><div class="bar-track"><div class="bar-fill" style="width:${total?100*v/Math.max(...dayTotals,1):0}%"></div></div><span class="bar-value">${v?minsText(v):'۰'}</span></div>`).join('');
+ let subjects=Object.fromEntries(SUBJECTS.map(s=>[s,0]));all.forEach(p=>subjects[p.subject]=(subjects[p.subject]||0)+(+p.duration||0));let entries=Object.entries(subjects).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]),zeros=Object.entries(subjects).filter(([,v])=>v===0).map(([s])=>s);$('subjectBars').innerHTML=(entries.map(([s,v])=>`<div class="bar-row"><span>${esc(s)}</span><div class="bar-track"><div class="bar-fill" style="width:${total?100*v/total:0}%"></div></div><span class="bar-value">${minsText(v)}</span></div>`).join('')||'<div class="empty">هنوز زمانی ثبت نشده</div>')+(zeros.length?`<div class="zero-subjects">بدون برنامه: ${zeros.map(esc).join('، ')}</div>`:'')}
+function openPart(day,index=null){editing={day,index};let p=index===null?{}:weekData.parts[day][index];$('modalTitle').textContent=index===null?'افزودن پارت مطالعاتی':'ویرایش پارت';$('subject').value=p.subject||SUBJECTS[0];$('topic').value=p.topic||'';$('duration').value=p.duration||'';$('details').value=p.details||'';$('targetDay').value=String(day);$('deletePart').style.visibility=index===null?'hidden':'visible';$('partModal').classList.add('show')}
+function closePart(){$('partModal').classList.remove('show');editing=null}
+$('savePart').onclick=()=>{let subject=$('subject').value,topic=$('topic').value.trim(),duration=Number($('duration').value),details=$('details').value.trim(),day=Number($('targetDay').value);if(!topic){alert('لطفاً مبحث را وارد کن.');return}if(!Number.isFinite(duration)||duration<1||duration>1440){alert('مدت باید بین ۱ تا ۱۴۴۰ دقیقه باشد.');return}let item={subject,topic,duration,details};if(editing.index===null)weekData.parts[day].push(item);else{weekData.parts[editing.day].splice(editing.index,1);weekData.parts[day].push(item)}closePart();saveWeek();render()};
+$('deletePart').onclick=()=>{if(editing&&editing.index!==null&&confirm('این پارت حذف شود؟')){weekData.parts[editing.day].splice(editing.index,1);closePart();saveWeek();render()}};
+$('cancelModal').onclick=closePart;$('partModal').onclick=e=>{if(e.target===$('partModal'))closePart()};
+$('targetDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');$('subject').innerHTML=SUBJECTS.map(s=>`<option>${s}</option>`).join('');
+$('prevWeek').onclick=async()=>{weekStart=shiftDate(weekStart,-7);await refreshWeek()};$('nextWeek').onclick=async()=>{weekStart=shiftDate(weekStart,7);await refreshWeek()};$('todayBtn').onclick=async()=>{weekStart=startOfSaturday(new Date());await refreshWeek()};
+$('clearBtn').onclick=()=>{if(confirm('برنامه این هفته از صفر شروع شود؟ پارت‌های فعلی این هفته حذف می‌شوند.')){weekData=blankWeek();saveWeek();render()}};
+$('copyBtn').onclick=async()=>{let prev=shiftDate(weekStart,-7),source=await loadWeek(getWeekKey(prev));if(!source||!source.parts.some(a=>a.length)){alert('برای هفته قبل برنامه‌ای پیدا نشد.');return}if(!confirm('برنامه هفته قبل روی هفته فعلی کپی شود؟ اطلاعات فعلی این هفته جایگزین می‌شود.'))return;weekData={key:getWeekKey(weekStart),parts:source.parts.map(day=>day.map(p=>({...p}))),note:source.note||''};saveWeek();render()};
+$('note').addEventListener('input',()=>{weekData.note=$('note').value;$('noteStatus').textContent='در حال ذخیره...';clearTimeout(noteSaveTimer);noteSaveTimer=setTimeout(()=>{saveWeek();$('noteStatus').textContent='ذخیره شد'},500)});
+$('expandNote').onclick=()=>{$('bigNote').value=weekData.note||'';$('noteModal').classList.add('show')};$('closeNote').onclick=()=>$('noteModal').classList.remove('show');$('saveNote').onclick=()=>{weekData.note=$('bigNote').value;$('note').value=weekData.note;saveWeek();$('noteModal').classList.remove('show')};
+$('themeBtn').onclick=()=>{themeIndex=(themeIndex+1)%themes.length;document.body.dataset.theme=themes[themeIndex];localStorage.setItem('sp-theme',themes[themeIndex])};
+
+// GitHub sync: token is entered by the owner and stored in this browser only.
+let GH_TOKEN=localStorage.getItem('sp-gh-token')||'';
+const GH_CONFIG={owner:'armanpourheydari',repo:'study-planner-data',branch:'main',path:'study-planner.json'};
+let ghSyncTimer=null;
+let ghSyncInProgress=false;
+function scheduleGithubSync(delay=1800){
+ if(ghSyncTimer)clearTimeout(ghSyncTimer);
+ ghSyncTimer=setTimeout(()=>{
+  if(navigator.onLine)githubSync();
+  else ghStatus('تغییرات روی همین دستگاه ذخیره شد؛ پس از اتصال اینترنت همگام‌سازی می‌شود.');
+ },delay);
+}
+
+function ghStatus(message,isError=false){
+ const el=$('ghStatus'); if(el){el.textContent=message;el.style.color=isError?'#ff9b9b':'var(--muted)';}
+}
+function bytesToBase64(bytes){
+ let binary='';const chunk=0x8000;
+ for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+ return btoa(binary);
+}
+function textToBase64(text){return bytesToBase64(new TextEncoder().encode(text))}
+function base64ToText(value){
+ const binary=atob(value.replace(/\s/g,''));
+ const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+ return new TextDecoder().decode(bytes);
+}
+async function ghRequest(url,token,options={}){
+ const response=await fetch(url,{
+  ...options,
+  headers:{
+   'Accept':'application/vnd.github+json',
+   'Authorization':'Bearer '+token,
+   'X-GitHub-Api-Version':'2022-11-28',
+   ...(options.headers||{})
+  }
+ });
+ if(!response.ok){
+  let detail='';try{const j=await response.json();detail=j.message||''}catch(e){}
+  const err=new Error(`GitHub (${response.status}) ${detail}`.trim());err.status=response.status;throw err;
+ }
+ return response.status===204?null:response.json();
+}
+async function getAllLocalWeeks(){
+ return new Promise((resolve,reject)=>{
+  const req=db.transaction(STORE).objectStore(STORE).getAll();
+  req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);
+ });
+}
+function mergeWeekLists(localWeeks,remoteWeeks){
+ const map=new Map();
+ for(const w of [...remoteWeeks,...localWeeks]){
+  if(!w||!w.key)continue;
+  const old=map.get(w.key);
+  const t=Number(w.updatedAt)||0,oldT=old?(Number(old.updatedAt)||0):-1;
+  if(!old||t>=oldT)map.set(w.key,w);
+ }
+ return [...map.values()].sort((a,b)=>String(a.key).localeCompare(String(b.key)));
+}
+async function replaceLocalWeeks(weeks){
+ await new Promise((resolve,reject)=>{
+  const tx=db.transaction(STORE,'readwrite'),store=tx.objectStore(STORE);
+  store.clear();weeks.forEach(w=>store.put(w));
+  tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });
+}
+async function githubSync(){
+ if(ghSyncInProgress)return;
+ ghSyncInProgress=true;
+ const config=GH_CONFIG;
+ const token=(localStorage.getItem('sp-gh-token')||'').trim();
+ GH_TOKEN=token;
+ if(!token){ghStatus('ابتدا توکن جدید GitHub را در کادر بالا وارد و ذخیره کن.',true);ghSyncInProgress=false;return;}
+ const button=$('ghSync');button.disabled=true;button.textContent='در حال همگام‌سازی…';
+ ghStatus('در حال خواندن اطلاعات مخزن خصوصی…');
+ try{
+  const encodedPath=config.path.split('/').map(encodeURIComponent).join('/');
+  const url=`https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${encodedPath}?ref=${encodeURIComponent(config.branch)}`;
+  let remoteWeeks=[],sha=null;
+  try{
+   const file=await ghRequest(url,token);
+   sha=file.sha;
+   const parsed=JSON.parse(base64ToText(file.content));
+   if(parsed.app!=='StudyPlanner'||!Array.isArray(parsed.weeks))throw new Error('ساختار فایل ابری معتبر نیست یا متعلق به Study Planner نیست.');
+   remoteWeeks=parsed.weeks;
+  }catch(e){
+   if(e.status!==404)throw e;
+  }
+  ghStatus('در حال ادغام هفته‌های این دستگاه و فضای ابری…');
+  const localWeeks=await getAllLocalWeeks();
+  const now=Date.now();
+  localWeeks.forEach(w=>{if(!w.updatedAt)w.updatedAt=now;});
+  const merged=mergeWeekLists(localWeeks,remoteWeeks);
+  const payload={app:'StudyPlanner',version:2,updatedAt:now,weeks:merged};
+  const body={
+   message:'Study Planner sync',
+   content:textToBase64(JSON.stringify(payload,null,2)),
+   branch:config.branch
+  };
+  if(sha)body.sha=sha;
+  const putUrl=`https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${encodedPath}`;
+  await ghRequest(putUrl,token,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  await replaceLocalWeeks(merged);
+  const current=merged.find(w=>w.key===getWeekKey(weekStart));
+  weekData=current||blankWeek();
+  undoStack=[];redoStack=[];lastSnapshot=snapshot();render();updateHistoryButtons();
+  const faTime=new Intl.DateTimeFormat('fa-IR',{hour:'2-digit',minute:'2-digit'}).format(new Date());
+  ghStatus(`همگام‌سازی موفق بود؛ ${merged.length} هفته هماهنگ شد. (${faTime})`);
+ }catch(e){
+  console.error(e);
+  let message=e.message||'خطای ناشناخته';
+  if(e.status===401)message='توکن نامعتبر یا منقضی شده است. توکن را بررسی کن.';
+  else if(e.status===403)message='دسترسی کافی نیست یا محدودیت درخواست GitHub فعال شده؛ مجوز Contents: Read and write را بررسی کن.';
+  else if(e.status===404)message='مخزن، شاخه یا مسیر فایل پیدا نشد؛ نام‌ها و دسترسی توکن را بررسی کن.';
+  else if(e.status===409||e.status===422)message='فایل هم‌زمان تغییر کرده یا GitHub تعارض تشخیص داده است. دوباره همگام‌سازی را بزن.';
+  else if(message.includes('Failed to fetch'))message='ارتباط با GitHub برقرار نشد. اتصال اینترنت یا دسترسی به GitHub API را بررسی کن.';
+  ghStatus('همگام‌سازی انجام نشد: '+message,true);
+ }finally{
+  button.disabled=false;button.textContent='↕ همگام‌سازی اکنون';
+  ghSyncInProgress=false;
+ }
+}
+$('ghSaveToken').onclick=()=>{
+ const value=$('ghTokenInput').value.trim();
+ if(!value){ghStatus('توکن خالی است؛ ابتدا توکن جدید را وارد کن.',true);return;}
+ localStorage.setItem('sp-gh-token',value);GH_TOKEN=value;$('ghTokenInput').value='';
+ ghStatus('توکن در این مرورگر ذخیره شد؛ در حال همگام‌سازی…');githubSync();
+};
+$('ghSync').onclick=githubSync;
+
+$('exportBtn').onclick=async()=>{let req=db.transaction(STORE).objectStore(STORE).getAll();req.onsuccess=()=>{let blob=new Blob([JSON.stringify({app:'StudyPlanner',version:1,weeks:req.result},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='study-planner-backup.json';a.click();URL.revokeObjectURL(a.href)}};
+$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{let file=e.target.files[0];if(!file)return;try{let data=JSON.parse(await file.text());if(!Array.isArray(data.weeks))throw Error();if(!confirm('اطلاعات فایل به برنامه اضافه شود؟ هفته‌های هم‌نام جایگزین می‌شوند.'))return;let tx=db.transaction(STORE,'readwrite');data.weeks.forEach(w=>{if(w.key&&Array.isArray(w.parts))tx.objectStore(STORE).put(w)});tx.oncomplete=()=>{alert('بازیابی انجام شد.');refreshWeek()}}catch{alert('فایل پشتیبان معتبر نیست.')}e.target.value=''};
+$('importWeekBtn').onclick=()=>$('importWeekFile').click();$('importWeekFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());let weeks=Array.isArray(data.weeks)?data.weeks:(data.parts? [data]:[]);weeks=weeks.filter(w=>Array.isArray(w.parts));if(!weeks.length)throw Error('no week');let chosen=weeks[0];if(weeks.length>1){const labels=weeks.map((w,i)=>`${i+1}) ${w.key||'هفته بدون تاریخ'}`).join('\n');const n=Number(prompt('شماره هفته‌ای که می‌خواهی وارد شود:\n'+labels,'1'));if(!Number.isInteger(n)||n<1||n>weeks.length)return;chosen=weeks[n-1]}if(!confirm('برنامه انتخاب‌شده جایگزین برنامه همین هفته شود؟'))return;const normalized=DAYS.map((_,i)=>(chosen.parts[i]||[]).map(p=>({subject:p.subject||SUBJECTS[0],topic:String(p.topic||''),duration:Number(p.duration)||0,details:String(p.details||'')})));weekData={key:getWeekKey(weekStart),parts:normalized,note:chosen.note||''};saveWeek();render();alert('برنامه با موفقیت به همین هفته وارد شد.')}catch{alert('فایل معتبر نیست. برای این قابلیت فایل پشتیبان JSON برنامه را انتخاب کن.')}e.target.value=''};
+
+function xmlEscape(value){return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;')}
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function crc32(bytes){let c=-1;for(let i=0;i<bytes.length;i++){c^=bytes[i];for(let k=0;k<8;k++)c=(c>>>1)^((c&1)?0xEDB88320:0)}return (c^-1)>>>0}
+function zipStore(files){const enc=new TextEncoder(),local=[],central=[];let offset=0;for(const f of files){const name=enc.encode(f.name),data=typeof f.data==='string'?enc.encode(f.data):f.data,crc=crc32(data),lh=new Uint8Array(30+name.length),lv=new DataView(lh.buffer);lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0x800,true);lv.setUint16(8,0,true);lv.setUint32(14,crc,true);lv.setUint32(18,data.length,true);lv.setUint32(22,data.length,true);lv.setUint16(26,name.length,true);lh.set(name,30);local.push(lh,data);const ch=new Uint8Array(46+name.length),cv=new DataView(ch.buffer);cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0x800,true);cv.setUint16(10,0,true);cv.setUint32(16,crc,true);cv.setUint32(20,data.length,true);cv.setUint32(24,data.length,true);cv.setUint16(28,name.length,true);cv.setUint32(42,offset,true);ch.set(name,46);central.push(ch);offset+=lh.length+data.length}const centralSize=central.reduce((n,a)=>n+a.length,0),end=new Uint8Array(22),v=new DataView(end.buffer);v.setUint32(0,0x06054b50,true);v.setUint16(8,files.length,true);v.setUint16(10,files.length,true);v.setUint32(12,centralSize,true);v.setUint32(16,offset,true);return new Blob([...local,...central,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+function xmlEscape(s=''){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;')}
+function reportStamp(){const d=new Date(),pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`}
+function reportBaseName(){const ds=weekDates();const key=d=>`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;return `StudyFlow_${key(ds[0])}-${key(ds[6])}_${reportStamp()}`}
+async function chooseReportsFolder(){
+ if(!window.showDirectoryPicker){alert('این مرورگر امکان ذخیره مستقیم در پوشه انتخابی را ندارد. خروجی‌ها به پوشه دانلودها می‌روند.');return false}
+ try{reportDirectoryHandle=await window.showDirectoryPicker({id:'studyflow-reports',mode:'readwrite'});alert('پوشه انتخاب شد. از این به بعد گزارش‌ها مستقیماً در همین پوشه ذخیره می‌شوند.');return true}
+ catch(e){if(e.name!=='AbortError')alert('انتخاب پوشه انجام نشد: '+e.message);return false}
+}
+async function saveReportBlob(blob,extension){
+ if(!reportDirectoryHandle&&window.showDirectoryPicker){const ok=await chooseReportsFolder();if(!ok){downloadBlob(blob,reportBaseName()+'.'+extension);return}}
+ if(reportDirectoryHandle){
+  try{let perm=await reportDirectoryHandle.queryPermission({mode:'readwrite'});if(perm!=='granted')perm=await reportDirectoryHandle.requestPermission({mode:'readwrite'});if(perm==='granted'){const fh=await reportDirectoryHandle.getFileHandle(reportBaseName()+'.'+extension,{create:true});const w=await fh.createWritable();await w.write(blob);await w.close();alert('گزارش در پوشه انتخاب‌شده ذخیره شد.');return}}
+  catch(e){console.warn('Folder save failed; using browser download.',e)}
+ }
+ downloadBlob(blob,reportBaseName()+'.'+extension);
+}
+function buildWorkbook(){
+ const dates=weekDates(),parts=weekData.parts||DAYS.map(()=>[]),all=parts.flat(),total=all.reduce((a,p)=>a+(+p.duration||0),0),dayTotals=DAYS.map((_,i)=>(parts[i]||[]).reduce((a,p)=>a+(+p.duration||0),0));
+ const subjectTotals=Object.fromEntries(SUBJECTS.map(x=>[x,0]));all.forEach(p=>subjectTotals[p.subject]=(subjectTotals[p.subject]||0)+(+p.duration||0));
+ const positive=Object.entries(subjectTotals).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]),zero=Object.entries(subjectTotals).filter(([,v])=>v===0).map(([s])=>s);
+ const cell=(ref,value,style=0,type='s')=>type==='n'?`<c r="${ref}" s="${style}"><v>${Number(value)||0}</v></c>`:`<c r="${ref}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`;
+ const rows=[],merges=[];let r=1;
+ rows.push(`<row r="${r}" ht="36" customHeight="1">${cell('A1',`برنامه مطالعاتی هفتگی | ${fmtDate(dates[0],{month:true})} تا ${fmtDate(dates[6],{month:true,year:true})}`,1)}</row>`);merges.push('A1:E1');r++;
+ rows.push(`<row r="${r}" ht="29" customHeight="1">${['روز هفته','درس','مبحث','مدت (دقیقه)','توضیحات'].map((x,i)=>cell(String.fromCharCode(65+i)+r,x,2)).join('')}</row>`);r++;
+ DAYS.forEach((day,i)=>{
+  const dayParts=parts[i]||[],start=r,items=dayParts.length?dayParts:[null];
+  items.forEach((p,j)=>{
+   const cells=[];
+   if(j===0)cells.push(cell('A'+r,`${day}\n${fmtDate(dates[i])}`,3));
+   else cells.push('');
+   if(p){const si=SUBJECTS.indexOf(p.subject),subjectStyle=si>=0?4+si:4;cells.push(cell('B'+r,p.subject,subjectStyle),cell('C'+r,p.topic||'',17),cell('D'+r,p.duration,18,'n'),cell('E'+r,p.details||'',17));}
+   else cells.push(cell('B'+r,'—',17),cell('C'+r,'',17),cell('D'+r,0,18,'n'),cell('E'+r,'',17));
+   rows.push(`<row r="${r}" ht="${p?30:26}" customHeight="1">${cells.join('')}</row>`);r++;
+  });
+  const end=r-1;if(end>start)merges.push(`A${start}:A${end}`);
+ });
+ const last=r-1;
+ const scheduleSheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView rightToLeft="1" showGridLines="0" workbookViewId="0"><pane ySplit="2" topLeftCell="A3" activePane="bottomRight" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="24"/><cols><col min="1" max="1" width="18" customWidth="1"/><col min="2" max="2" width="22" customWidth="1"/><col min="3" max="3" width="36" customWidth="1"/><col min="4" max="4" width="18" customWidth="1"/><col min="5" max="5" width="45" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells></worksheet>`;
+ // Analysis worksheet
+ const ar=[];let q=1;const addRow=(cells,height=25)=>ar.push(`<row r="${q}" ht="${height}" customHeight="1">${cells.join('')}</row>`),aCell=(col,val,style=17,type='s')=>cell(col+q,val,style,type);
+ addRow([aCell('A',`تحلیل برنامه هفتگی | ${fmtDate(dates[0],{month:true})} تا ${fmtDate(dates[6],{month:true,year:true})}`,1)] ,36);q++;
+ addRow([aCell('A','شاخص',2),aCell('B','مقدار',2)]);q++;
+ addRow([aCell('A','کل زمان برنامه‌ریزی‌شده'),aCell('B',minsText(total),4)]);q++;
+ addRow([aCell('A','تعداد کل پارت‌ها'),aCell('B',all.length,5,'n')]);q++;
+ addRow([aCell('A','میانگین زمان روزانه'),aCell('B',minsText(Math.round(total/7)),4)]);q+=2;
+ addRow([aCell('A','زمان اختصاص‌یافته به هر روز',1)]);q++;
+ addRow([aCell('A','روز',2),aCell('B','زمان (ساعت و دقیقه)',2),aCell('C','دقیقه',2)]);q++;
+ DAYS.forEach((day,i)=>{addRow([aCell('A',`${day} - ${fmtDate(dates[i])}`),aCell('B',minsText(dayTotals[i])),aCell('C',dayTotals[i],18,'n')]);q++});q++;
+ addRow([aCell('A','توزیع زمان بین درس‌ها',1)]);q++;
+ addRow([aCell('A','درس',2),aCell('B','زمان (ساعت و دقیقه)',2),aCell('C','دقیقه',2),aCell('D','سهم از کل',2)]);q++;
+ positive.forEach(([sub,v])=>{addRow([aCell('A',sub,4+Math.max(0,SUBJECTS.indexOf(sub))),aCell('B',minsText(v)),aCell('C',v,18,'n'),aCell('D',total?`${(100*v/total).toFixed(1)}٪`:'۰٪')]);q++});
+ if(zero.length){q++;addRow([aCell('A','درس‌های بدون زمان برنامه‌ریزی‌شده',1)]);q++;addRow([aCell('A',zero.join('، '),17)]);}
+ const analysisSheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView rightToLeft="1" showGridLines="0" workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="25"/><cols><col min="1" max="1" width="34" customWidth="1"/><col min="2" max="2" width="24" customWidth="1"/><col min="3" max="3" width="16" customWidth="1"/><col min="4" max="4" width="16" customWidth="1"/></cols><sheetData>${ar.join('')}</sheetData><mergeCells count="3"><mergeCell ref="A1:D1"/><mergeCell ref="A7:D7"/><mergeCell ref="A17:D17"/></mergeCells></worksheet>`;
+ const fonts=`<fonts count="4"><font><sz val="10"/><name val="Vazirmatn"/></font><font><b/><sz val="16"/><color rgb="FFFFFFFF"/><name val="Vazirmatn"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Vazirmatn"/></font><font><b/><sz val="10"/><name val="Vazirmatn"/></font></fonts>`;
+ const fills=`<fills count="${4+SUBJECTS.length}"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF282B55"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF45517B"/></patternFill></fill>${SUBJECTS.map(s=>`<fill><patternFill patternType="solid"><fgColor rgb="FF${(SUBJECT_COLOR_MAP[s]||'#eeeeee').slice(1)}"/></patternFill></fill>`).join('')}</fills>`;
+ const borders=`<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FF9AA6C5"/></left><right style="thin"><color rgb="FF9AA6C5"/></right><top style="thin"><color rgb="FF9AA6C5"/></top><bottom style="thin"><color rgb="FF9AA6C5"/></bottom><diagonal/></border></borders>`;
+ const xfs=[`<xf xfId="0" fontId="0" fillId="0" borderId="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>`,`<xf xfId="0" fontId="1" fillId="2" borderId="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>`,`<xf xfId="0" fontId="2" fillId="3" borderId="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>`,`<xf xfId="0" fontId="3" fillId="3" borderId="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>`,...SUBJECTS.map((_,i)=>`<xf xfId="0" fontId="0" fillId="${4+i}" borderId="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>`),`<xf xfId="0" fontId="0" fillId="0" borderId="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>`,`<xf xfId="0" fontId="0" fillId="0" borderId="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>`];
+ const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="0"/>${fonts}${fills}<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FF9AA6C5"/></left><right style="thin"><color rgb="FF9AA6C5"/></right><top style="thin"><color rgb="FF9AA6C5"/></top><bottom style="thin"><color rgb="FF9AA6C5"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+ const files=[
+  {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
+  {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+  {name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="برنامه هفتگی" sheetId="1" r:id="rId1"/><sheet name="تحلیل هفتگی" sheetId="2" r:id="rId2"/></sheets></workbook>'},
+  {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+  {name:'xl/styles.xml',data:styles},{name:'xl/worksheets/sheet1.xml',data:scheduleSheet},{name:'xl/worksheets/sheet2.xml',data:analysisSheet}
+ ];
+ return zipStore(files);
+}
+async function exportExcel(){await saveReportBlob(buildWorkbook(),'xlsx')}
+function exportPDF(){window.print();}
+async function exportScheduleImage(){const dates=weekDates(),scale=2,canvas=document.createElement('canvas'),W=2100,H=1160;canvas.width=W*scale;canvas.height=H*scale;const ctx=canvas.getContext('2d');ctx.scale(scale,scale);const css=getComputedStyle(document.body),v=n=>css.getPropertyValue(n).trim();const bg=v('--bg'),panel=v('--panel'),panel2=v('--panel2'),line=v('--line'),text=v('--text'),muted=v('--muted'),accent=v('--accent'),accent2=v('--accent2'),glow=v('--glow');const grad=ctx.createLinearGradient(0,0,W,H);grad.addColorStop(0,bg);grad.addColorStop(.55,panel);grad.addColorStop(1,bg);ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);ctx.globalAlpha=.5;ctx.fillStyle=glow;ctx.beginPath();ctx.ellipse(240,60,430,250,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle=text;ctx.font='bold 34px Vazirmatn, sans-serif';ctx.textAlign='right';ctx.direction='rtl';ctx.fillText('✦ برنامه مطالعاتی هفتگی',W-55,62);ctx.font='20px Vazirmatn, sans-serif';ctx.fillStyle=muted;ctx.fillText(`${fmtDate(dates[0],{month:true})} تا ${fmtDate(dates[6],{month:true,year:true})}`,W-55,98);const gap=14,margin=42,top=135,colW=(W-margin*2-gap*6)/7,cardGap=10;for(let i=0;i<7;i++){const x=W-margin-colW-i*(colW+gap),y=top;ctx.fillStyle=panel2;roundRect(ctx,x,y,colW,950,18);ctx.fill();ctx.strokeStyle=line;ctx.lineWidth=2;roundRect(ctx,x,y,colW,950,18);ctx.stroke();ctx.fillStyle=text;ctx.font='bold 22px Vazirmatn, sans-serif';ctx.textAlign='right';ctx.direction='rtl';ctx.fillText(DAYS[i],x+colW-17,y+34);ctx.font='16px Vazirmatn, sans-serif';ctx.fillStyle=muted;ctx.fillText(fmtDate(dates[i]),x+colW-17,y+61);ctx.strokeStyle=line;ctx.beginPath();ctx.moveTo(x+12,y+78);ctx.lineTo(x+colW-12,y+78);ctx.stroke();let cy=y+94;const parts=weekData.parts[i]||[];if(!parts.length){ctx.font='15px Vazirmatn, sans-serif';ctx.fillStyle=muted;ctx.fillText('بدون پارت',x+colW-16,cy+20);continue}parts.forEach(p=>{const color=SUBJECT_COLOR_MAP[p.subject]||accent,lines=wrapCanvasText(ctx,p.topic,colW-32,17),detailLines=p.details?wrapCanvasText(ctx,p.details,colW-32,14):[],ch=68+Math.max(0,lines.length-1)*22+detailLines.length*18;ctx.fillStyle=color+'25';roundRect(ctx,x+10,cy,colW-20,ch,11);ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;roundRect(ctx,x+10,cy,colW-20,ch,11);ctx.stroke();ctx.textAlign='right';ctx.direction='rtl';ctx.fillStyle=color;ctx.font='bold 14px Vazirmatn, sans-serif';ctx.fillText(p.subject,x+colW-20,cy+21);ctx.fillStyle=text;ctx.font='bold 15px Vazirmatn, sans-serif';lines.forEach((line,j)=>ctx.fillText(line,x+colW-20,cy+42+j*21));let metaY=cy+45+Math.max(0,lines.length-1)*21;ctx.fillStyle=muted;ctx.font='13px Vazirmatn, sans-serif';ctx.fillText(minsText(p.duration),x+colW-20,metaY+15);detailLines.forEach((line,j)=>ctx.fillText(line,x+colW-20,metaY+34+j*18));cy+=ch+cardGap})}canvas.toBlob(async blob=>{if(blob)await saveReportBlob(blob,'png');else alert('ساخت تصویر در این مرورگر ممکن نشد.')},'image/png')}
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function wrapCanvasText(ctx,text,maxWidth,fontSize){
+ ctx.font=`${fontSize}px Vazirmatn, sans-serif`;const words=String(text||'').split(/\s+/),lines=[];let line='';
+ words.forEach(word=>{const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test});
+ if(line)lines.push(line);return lines.slice(0,4);
+}
+$('folderBtn').onclick=chooseReportsFolder;
+$('excelBtn').onclick=exportExcel;
+$('pdfBtn').onclick=exportPDF;
+$('imageBtn').onclick=exportScheduleImage;
+$('undoBtn').onclick=undo;$('redoBtn').onclick=redo;
+document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select,[contenteditable=true]'))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}});
+$('weekGrid').addEventListener('pointerover',e=>{const card=e.target.closest('.part');if(!card)return;const subject=card.dataset.subject;$('weekGrid').querySelectorAll('.part').forEach(el=>el.classList.toggle(el.dataset.subject===subject?'subject-match':'subject-dim',true))});
+$('weekGrid').addEventListener('pointerout',e=>{const card=e.target.closest('.part');if(!card||card.contains(e.relatedTarget))return;$('weekGrid').querySelectorAll('.part').forEach(el=>el.classList.remove('subject-match','subject-dim'))});
+
+(async()=>{try{await openDB();let saved=localStorage.getItem('sp-theme');if(themes.includes(saved)){themeIndex=themes.indexOf(saved);document.body.dataset.theme=saved}weekStart=startOfSaturday(new Date());await refreshWeek();if(localStorage.getItem('sp-gh-token'))await githubSync();else ghStatus('برای شروع، توکن جدید GitHub را در کادر بالا وارد و ذخیره کن.')}catch(e){alert('مرورگر امکان ذخیره‌سازی محلی را فراهم نکرد. لطفاً در مرورگر اصلی گوشی یا لپ‌تاپ باز کن.')}})();
+window.addEventListener('online',()=>{ghStatus('اینترنت وصل شد؛ در حال همگام‌سازی…');scheduleGithubSync(300)});
+window.addEventListener('focus',()=>{if(navigator.onLine)scheduleGithubSync(500)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&navigator.onLine)scheduleGithubSync(500)});
+</script>
+</body>
+</html>
